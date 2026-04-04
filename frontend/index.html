@@ -3,61 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Loan Risk Analysis and Prediction Dashboard - AI-powered risk assessment system">
   <title>Loan Risk Dashboard</title>
   <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
   <div class="page-shell">
-    <header class="hero">
+    <header class="hero" role="banner" aria-labelledby="page-title">
       <div class="hero-copy">
-        <p class="eyebrow">Loan Risk Analysis And Prediction System</p>
-        <h1>Frontend dashboard for the full syllabus-aligned project.</h1>
+        <p class="eyebrow" aria-label="System name">Loan Risk Analysis And Prediction System</p>
+        <h1 id="page-title">AI-Powered Risk Assessment Dashboard</h1>
         <p class="hero-text">
-          This interface presents the end-to-end flow from preprocessing and ETL to rule mining,
-          classification, clustering, and the final prediction module.
+          This interactive dashboard presents the end-to-end machine learning pipeline from data preprocessing and ETL 
+          to rule mining, classification, clustering, and real-time predictions.
         </p>
       </div>
-      <div class="hero-panel">
-        <p class="panel-label">Best Model</p>
-        <h2>Decision Tree</h2>
-        <p class="panel-metric">F1 Score: <strong>0.1476</strong></p>
+      <div class="hero-panel" role="region" aria-labelledby="best-model-label">
+        <p class="panel-label" id="best-model-label">Best Model</p>
+        <h2 id="best-model-name">Decision Tree</h2>
+        <p class="panel-metric">F1 Score: <strong id="f1-score">0.1476</strong></p>
         <p class="panel-note">Chosen from Logistic Regression, Decision Tree, and Random Forest.</p>
       </div>
     </header>
 
-    <main class="dashboard">
-      <section class="card stats-card">
+    <main class="dashboard" role="main">
+      <section class="card stats-card" aria-labelledby="snapshot-heading">
         <div class="section-heading">
           <p class="eyebrow">Project Snapshot</p>
-          <h3>Core outcomes</h3>
+          <h3 id="snapshot-heading">Core outcomes</h3>
         </div>
-        <div class="stats-grid" id="stats-grid"></div>
+        <div class="stats-grid" id="stats-grid" role="region" aria-live="polite"></div>
       </section>
 
-      <section class="card">
+      <section class="card" aria-labelledby="prediction-heading">
         <div class="section-heading">
           <p class="eyebrow">Prediction Module</p>
-          <h3>Demo borrower result</h3>
+          <h3 id="prediction-heading">Demo borrower result</h3>
         </div>
-        <div class="prediction-grid" id="prediction-grid"></div>
+        <div class="prediction-grid" id="prediction-grid" role="region" aria-live="polite"></div>
       </section>
 
-      <section class="card wide-card">
+      <section class="card chart-card" aria-labelledby="models-chart-heading">
+        <div class="section-heading">
+          <p class="eyebrow">Model Comparison</p>
+          <h3 id="models-chart-heading">Classification performance</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="models-chart" role="img" aria-label="Bar chart showing F1 scores and accuracy for different classification models"></canvas>
+        </div>
+        <div class="model-list" id="model-list" role="region" aria-live="polite"></div>
+      </section>
+
+      <section class="card chart-card" aria-labelledby="clusters-chart-heading">
+        <div class="section-heading">
+          <p class="eyebrow">Risk Segmentation</p>
+          <h3 id="clusters-chart-heading">K-Means cluster distribution</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="clusters-chart" role="img" aria-label="Pie chart showing distribution of loans across risk clusters"></canvas>
+        </div>
+        <div class="cluster-list" id="cluster-list" role="region" aria-live="polite"></div>
+      </section>
+
+      <section class="card wide-card" aria-labelledby="simulation-heading">
         <div class="section-heading">
           <p class="eyebrow">What-If Simulation</p>
-          <h3>Scenario comparison</h3>
+          <h3 id="simulation-heading">Scenario comparison</h3>
         </div>
         <div class="table-wrap">
-          <table>
+          <table role="table">
             <thead>
               <tr>
-                <th>Scenario</th>
-                <th>Loan Amount</th>
-                <th>DTI</th>
-                <th>Term</th>
-                <th>Default Probability</th>
-                <th>Stage</th>
-                <th>Cluster</th>
+                <th scope="col">Scenario</th>
+                <th scope="col">Loan Amount</th>
+                <th scope="col">DTI</th>
+                <th scope="col">Term (months)</th>
+                <th scope="col">Default Probability</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Cluster</th>
               </tr>
             </thead>
             <tbody id="simulation-body"></tbody>
@@ -65,38 +89,27 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="section-heading">
-          <p class="eyebrow">Model Comparison</p>
-          <h3>Classification metrics</h3>
-        </div>
-        <div class="model-list" id="model-list"></div>
-      </section>
-
-      <section class="card">
-        <div class="section-heading">
-          <p class="eyebrow">Risk Segmentation</p>
-          <h3>K-Means cluster summary</h3>
-        </div>
-        <div class="cluster-list" id="cluster-list"></div>
-      </section>
-
-      <section class="card wide-card">
+      <section class="card wide-card" aria-labelledby="pipeline-heading">
         <div class="section-heading">
           <p class="eyebrow">System Architecture</p>
-          <h3>Pipeline flow</h3>
+          <h3 id="pipeline-heading">End-to-end pipeline</h3>
         </div>
-        <div class="flow-steps">
-          <span>Dataset</span>
-          <span>Preprocessing</span>
-          <span>ETL</span>
-          <span>Warehouse</span>
-          <span>Mining</span>
-          <span>ML Models</span>
-          <span>Visualization</span>
-          <span>Prediction</span>
+        <div class="flow-steps" role="list">
+          <span role="listitem" class="flow-step">📊 Dataset</span>
+          <span role="listitem" class="flow-step">🔧 Preprocessing</span>
+          <span role="listitem" class="flow-step">⚙️ ETL</span>
+          <span role="listitem" class="flow-step">🗄️ Warehouse</span>
+          <span role="listitem" class="flow-step">⛏️ Mining</span>
+          <span role="listitem" class="flow-step">🤖 ML Models</span>
+          <span role="listitem" class="flow-step">📈 Visualization</span>
+          <span role="listitem" class="flow-step">🎯 Prediction</span>
         </div>
       </section>
+    </main>
+  </div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
 
       <section class="card wide-card">
         <div class="section-heading">

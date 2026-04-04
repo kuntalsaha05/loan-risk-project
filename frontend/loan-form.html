@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Loan Risk Prediction Form">
+  <title>Loan Risk System - Predict Risk</title>
+  <link rel="stylesheet" href="main.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="home.html" class="nav-brand">🏦 LoanRisk Pro</a>
+      <ul class="nav-menu">
+        <li><a href="home.html" class="nav-link">Home</a></li>
+        <li><a href="loan-form.html" class="nav-link active">Predict Risk</a></li>
+        <li><a href="visualizations.html" class="nav-link">Analytics</a></li>
+        <li><a href="expense-manager.html" class="nav-link">Expenses</a></li>
+        <li><a href="admin.html" class="nav-link">Admin</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="text-center mb-40">
+      <h1>📊 Loan Risk Assessment Form</h1>
+      <p>Enter your financial details to get an instant risk prediction</p>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card">
+          <h2>💰 Loan Information</h2>
+          <form id="loanForm">
+            <div class="form-group">
+              <label for="loanAmount">Loan Amount ($)</label>
+              <input type="number" id="loanAmount" name="loanAmount" value="12000" min="1000" max="500000" step="1000" required>
+              <div class="input-info">Amount you want to borrow</div>
+            </div>
+
+            <div class="form-group">
+              <label for="annualIncome">Annual Income ($)</label>
+              <input type="number" id="annualIncome" name="annualIncome" value="50000" min="10000" max="1000000" step="1000" required>
+              <div class="input-info">Your annual household income</div>
+            </div>
+
+            <div class="form-group">
+              <label for="dti">Debt-to-Income Ratio (%)</label>
+              <input type="number" id="dti" name="dti" value="18.4" min="0" max="100" step="0.1" required>
+              <div class="input-info">Your total debts divided by income</div>
+            </div>
+
+            <div class="form-group">
+              <label for="loanTerm">Loan Term (Months)</label>
+              <select id="loanTerm" name="loanTerm" required>
+                <option value="36">36 months</option>
+                <option value="60">60 months</option>
+              </select>
+              <div class="input-info">Choose your preferred loan tenure</div>
+            </div>
+
+            <div class="form-group">
+              <label for="employmentType">Employment Type</label>
+              <select id="employmentType" name="employmentType" required>
+                <option value="employee">Employee</option>
+                <option value="self_employed">Self-Employed</option>
+                <option value="freelancer">Freelancer</option>
+              </select>
+              <div class="input-info">Your employment status</div>
+            </div>
+
+            <div class="form-group">
+              <label for="existingLoans">Existing Loans</label>
+              <input type="number" id="existingLoans" name="existingLoans" value="0" min="0" max="10" step="1" required>
+              <div class="input-info">Number of active loans</div>
+            </div>
+
+            <div class="form-group">
+              <label for="creditScore">Credit Score (Optional)</label>
+              <input type="number" id="creditScore" name="creditScore" value="750" min="300" max="850" step="1">
+              <div class="input-info">Your credit score (300-850)</div>
+            </div>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary">🔍 Predict Risk</button>
+              <button type="reset" class="btn btn-outlined">↻ Clear Form</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>📋 Form Guide</h2>
+          <div class="bg-light p-20 rounded-12 mb-20">
+            <h4>What You Need:</h4>
+            <ul class="ul-reset">
+              <li>Your desired loan amount</li>
+              <li>Annual income</li>
+              <li>Current debt obligations</li>
+              <li>Employment information</li>
+              <li>Optional: Credit score</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-info">
+            <strong>💡 Tip:</strong> Experiment with different values to see how changes affect your risk score. Use the "What-If Simulation" after getting results.
+          </div>
+
+          <h4 class="mt-24">Risk Categories:</h4>
+          <div class="mb-12">
+            <span class="badge badge-success">Low Risk</span> - 0-33% probability
+          </div>
+          <div class="mb-12">
+            <span class="badge badge-warning">Medium Risk</span> - 34-66% probability
+          </div>
+          <div class="mb-12">
+            <span class="badge badge-danger">High Risk</span> - 67-100% probability
+          </div>
+
+          <div class="alert alert-warning mt-24">
+            <strong>⚠️ Note:</strong> This assessment is for informational purposes. Actual lending decisions may vary based on additional factors.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsContainer"></div>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Loan Risk System. Built with advanced machine learning and data analytics.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="main.js"></script>
+  <script src="form.js"></script>
+</body>
+</html>
