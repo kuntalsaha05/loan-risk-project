@@ -5,7 +5,7 @@ This project is organized to align with syllabus Units I-IV and covers the full 
 ## How to Run the Project
 
 ### Prerequisites
-- Python 3.9 or higher
+- Python 3.9 or higher (sqlite3 is included in Python's standard library)
 
 ### Quick start
 
