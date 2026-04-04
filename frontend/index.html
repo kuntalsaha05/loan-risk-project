@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loan Risk Dashboard</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Loan Risk Analysis And Prediction System</p>
+        <h1>Frontend dashboard for the full syllabus-aligned project.</h1>
+        <p class="hero-text">
+          This interface presents the end-to-end flow from preprocessing and ETL to rule mining,
+          classification, clustering, and the final prediction module.
+        </p>
+      </div>
+      <div class="hero-panel">
+        <p class="panel-label">Best Model</p>
+        <h2>Decision Tree</h2>
+        <p class="panel-metric">F1 Score: <strong>0.1476</strong></p>
+        <p class="panel-note">Chosen from Logistic Regression, Decision Tree, and Random Forest.</p>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <section class="card stats-card">
+        <div class="section-heading">
+          <p class="eyebrow">Project Snapshot</p>
+          <h3>Core outcomes</h3>
+        </div>
+        <div class="stats-grid" id="stats-grid"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <p class="eyebrow">Prediction Module</p>
+          <h3>Demo borrower result</h3>
+        </div>
+        <div class="prediction-grid" id="prediction-grid"></div>
+      </section>
+
+      <section class="card wide-card">
+        <div class="section-heading">
+          <p class="eyebrow">What-If Simulation</p>
+          <h3>Scenario comparison</h3>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Scenario</th>
+                <th>Loan Amount</th>
+                <th>DTI</th>
+                <th>Term</th>
+                <th>Default Probability</th>
+                <th>Stage</th>
+                <th>Cluster</th>
+              </tr>
+            </thead>
+            <tbody id="simulation-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <p class="eyebrow">Model Comparison</p>
+          <h3>Classification metrics</h3>
+        </div>
+        <div class="model-list" id="model-list"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading">
+          <p class="eyebrow">Risk Segmentation</p>
+          <h3>K-Means cluster summary</h3>
+        </div>
+        <div class="cluster-list" id="cluster-list"></div>
+      </section>
+
+      <section class="card wide-card">
+        <div class="section-heading">
+          <p class="eyebrow">System Architecture</p>
+          <h3>Pipeline flow</h3>
+        </div>
+        <div class="flow-steps">
+          <span>Dataset</span>
+          <span>Preprocessing</span>
+          <span>ETL</span>
+          <span>Warehouse</span>
+          <span>Mining</span>
+          <span>ML Models</span>
+          <span>Visualization</span>
+          <span>Prediction</span>
+        </div>
+      </section>
+
+      <section class="card wide-card">
+        <div class="section-heading">
+          <p class="eyebrow">Project Visuals</p>
+          <h3>Generated charts</h3>
+        </div>
+        <div class="visual-grid">
+          <figure class="visual-card">
+            <img src="../report/visuals/risk_distribution.png" alt="Risk distribution graph">
+            <figcaption>Risk distribution</figcaption>
+          </figure>
+          <figure class="visual-card">
+            <img src="../report/visuals/cluster_scatter.png" alt="Cluster scatter graph">
+            <figcaption>Cluster graph</figcaption>
+          </figure>
+          <figure class="visual-card">
+            <img src="../report/visuals/association_rules.png" alt="Association rule chart">
+            <figcaption>Association rules</figcaption>
+          </figure>
+          <figure class="visual-card">
+            <img src="../report/visuals/feature_importance_proxy.png" alt="Model comparison chart">
+            <figcaption>Model comparison</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
