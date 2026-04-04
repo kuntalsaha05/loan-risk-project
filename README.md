@@ -2,6 +2,38 @@
 
 This project is organized to align with syllabus Units I-IV and covers the full workflow from dataset understanding to analytics, machine learning, and system implementation.
 
+## How to Run the Project
+
+### Prerequisites
+- Python 3.9 or higher
+
+### Quick start
+
+```bash
+# 1. Install dependencies
+pip install -r backend/requirements.txt
+
+# 2. Run the full pipeline (preprocessing → ETL → ML models → visualizations → demo)
+python run.py
+```
+
+`run.py` executes every stage in the correct order and prints progress to the terminal.
+After it completes, open `frontend/index.html` in a browser to view the dashboard.
+
+### Run individual stages
+
+| Stage | Command |
+| --- | --- |
+| Data preprocessing | `python backend/preprocess_data.py` |
+| ETL / database load | `python backend/load_to_database.py` |
+| Train classifiers | `python models/train_classification_models.py` |
+| K-Means clustering | `python models/kmeans_clustering.py` |
+| Association rule mining | `python models/association_rule_mining.py` |
+| Generate visualizations | `python models/generate_visualizations.py` |
+| System demo | `python backend/loan_risk_system.py` |
+
+---
+
 ## Current Setup
 
 - Raw dataset: `data/lending_club_loan_two.csv`
