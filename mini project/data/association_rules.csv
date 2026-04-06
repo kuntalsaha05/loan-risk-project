@@ -1,0 +1,21 @@
+antecedents,consequents,support,confidence,lift
+"grade_bucket_grade=A, income_bucket_income=high","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.06260131808196348,0.9273931096397711,3.2590799181017323
+"dti_bucket_dti=low, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.06701765017801682,0.9269050778794441,3.257364858443703
+"grade_bucket_grade=A, loan_bucket_loan=low","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.052377345150619904,0.9240878513832584,3.2474644546095304
+"credit_history_bucket_credit_history=medium, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.05096331086028836,0.9216402575460065,3.2388630278362003
+"grade_bucket_grade=D, term_bucket_term=short","default_bucket_default=no, interest_bucket_interest=high",0.07457010832512688,0.7176496318436976,3.2342253140682273
+"grade_bucket_grade=A, purpose_bucket_purpose=debt_consolidation","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.07473171224402192,0.9180470252497053,3.226235555088965
+"grade_bucket_grade=A, loan_bucket_loan=medium","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.05238744539555084,0.9175622484631374,3.2245319341827465
+"grade_bucket_grade=A, income_bucket_income=medium","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.051084513799459635,0.9175056689342403,3.224333100263789
+grade_bucket_grade=A,"default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.14855945256672473,0.9166030504619315,3.2211610843125897
+"dti_bucket_dti=medium, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.05061232734893821,0.9157110877609759,3.2180265152758314
+"credit_history_bucket_credit_history=high, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low, term_bucket_term=short",0.05824053733303033,0.9099696216514774,3.1978496380665575
+"grade_bucket_grade=A, income_bucket_income=high, term_bucket_term=short","default_bucket_default=no, interest_bucket_interest=low",0.06260131808196348,0.9532451553368193,3.1284799773600773
+"grade_bucket_grade=A, income_bucket_income=high","default_bucket_default=no, interest_bucket_interest=low",0.0642804838017322,0.9522687315303184,3.1252754267668186
+"dti_bucket_dti=low, grade_bucket_grade=A, term_bucket_term=short","default_bucket_default=no, interest_bucket_interest=low",0.06701765017801682,0.9511198709908619,3.121504951591208
+"dti_bucket_dti=low, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low",0.06874226699997475,0.950757840329678,3.1203167937827327
+grade_bucket_grade=D,"default_bucket_default=no, interest_bucket_interest=high",0.11074413554528698,0.6904162206410176,3.111492738181781
+"credit_history_bucket_credit_history=medium, grade_bucket_grade=A, term_bucket_term=short","default_bucket_default=no, interest_bucket_interest=low",0.05096331086028836,0.9420743091859596,3.091818087900187
+"credit_history_bucket_credit_history=medium, grade_bucket_grade=A","default_bucket_default=no, interest_bucket_interest=low",0.052079387925157185,0.9418238275720352,3.090996025800556
+"grade_bucket_grade=A, loan_bucket_loan=medium, term_bucket_term=short","default_bucket_default=no, interest_bucket_interest=low",0.05238744539555084,0.940182172474736,3.085608235395456
+"grade_bucket_grade=A, loan_bucket_loan=medium","default_bucket_default=no, interest_bucket_interest=low",0.05362977552205641,0.93932156914776,3.082783799035281

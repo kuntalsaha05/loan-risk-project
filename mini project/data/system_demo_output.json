@@ -1,0 +1,71 @@
+{
+  "input_profile": {
+    "loan_amnt": 12000.0,
+    "term": 36.0,
+    "int_rate": 11.5,
+    "installment": 395.0,
+    "grade": "B",
+    "sub_grade": "B3",
+    "annual_inc": 72000.0,
+    "verification_status": "Verified",
+    "purpose": "debt_consolidation",
+    "dti": 18.4,
+    "open_acc": 10.0,
+    "pub_rec": 0.0,
+    "revol_bal": 14500.0,
+    "revol_util": 52.0,
+    "mort_acc": 1.0,
+    "pub_rec_bankruptcies": 0.0,
+    "issue_year": 2019,
+    "issue_month": 6,
+    "credit_history_years": 8.5
+  },
+  "prediction": {
+    "default_probability": 0.081,
+    "default_stage": "non_default",
+    "risk_cluster": "low_risk",
+    "recommended_interest_rate": 10.5
+  },
+  "what_if_simulation": [
+    {
+      "scenario": "base_case",
+      "loan_amnt": 12000.0,
+      "dti": 18.4,
+      "term": 36.0,
+      "default_probability": 0.081,
+      "default_stage": "non_default",
+      "risk_cluster": "low_risk",
+      "recommended_interest_rate": 10.5
+    },
+    {
+      "scenario": "lower_loan_amount",
+      "loan_amnt": 10200.0,
+      "dti": 18.4,
+      "term": 36.0,
+      "default_probability": 0.081,
+      "default_stage": "non_default",
+      "risk_cluster": "low_risk",
+      "recommended_interest_rate": 10.5
+    },
+    {
+      "scenario": "lower_dti",
+      "loan_amnt": 12000.0,
+      "dti": 13.4,
+      "term": 36.0,
+      "default_probability": 0.0838,
+      "default_stage": "non_default",
+      "risk_cluster": "low_risk",
+      "recommended_interest_rate": 10.5
+    },
+    {
+      "scenario": "shorter_term",
+      "loan_amnt": 12000.0,
+      "dti": 18.4,
+      "term": 36.0,
+      "default_probability": 0.081,
+      "default_stage": "non_default",
+      "risk_cluster": "low_risk",
+      "recommended_interest_rate": 10.5
+    }
+  ]
+}
