@@ -2,103 +2,70 @@ from pathlib import Path
 import sqlite3
 import sys
 
-
 try:
     import pandas as pd
 except ModuleNotFoundError:
-    print(
-        "Missing dependency: pandas.\n"
-        "Install project dependencies first, for example:\n"
-        "pip install -r backend/requirements.txt"
-    )
+    print("pandas is not installed. Run: pip install -r backend/requirements.txt")
     sys.exit(1)
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = BASE_DIR / "data"
-PROCESSED_DATA_PATH = DATA_DIR / "processed_lending_club_loan.csv"
-DB_PATH = DATA_DIR / "loan_risk.db"
-ETL_REPORT_PATH = BASE_DIR / "report" / "ETL_PROCESS.md"
+# 1. Set file paths.
+base_dir = Path(__file__).resolve().parents[1]
+data_dir = base_dir / "data"
+report_dir = base_dir / "report"
+
+processed_file = data_dir / "processed_lending_club_loan.csv"
+database_file = data_dir / "loan_risk.db"
+etl_report_file = report_dir / "ETL_PROCESS.md"
 
 
-def print_heading(title: str) -> None:
-    print("\n" + "=" * 70)
-    print(title)
-    print("=" * 70)
+# 2. Extract: load the processed CSV file.
+if not processed_file.exists():
+    raise FileNotFoundError(f"Processed dataset not found: {processed_file}")
+
+df = pd.read_csv(processed_file, low_memory=False)
+print("Processed dataset loaded:")
+print(df.shape)
+print(df.head())
 
 
-def extract_data() -> pd.DataFrame:
-    if not PROCESSED_DATA_PATH.exists():
-        raise FileNotFoundError(f"Processed dataset not found: {PROCESSED_DATA_PATH}")
-    return pd.read_csv(PROCESSED_DATA_PATH, low_memory=False)
+# 3. Transform: convert date columns to simple YYYY-MM-DD text.
+if "issue_d" in df.columns:
+    df["issue_d"] = pd.to_datetime(df["issue_d"], errors="coerce").dt.strftime("%Y-%m-%d")
+
+if "earliest_cr_line" in df.columns:
+    df["earliest_cr_line"] = pd.to_datetime(
+        df["earliest_cr_line"], errors="coerce"
+    ).dt.strftime("%Y-%m-%d")
+
+print("\nDate columns formatted for database storage.")
 
 
-def transform_data(df: pd.DataFrame) -> pd.DataFrame:
-    transformed = df.copy()
+# 4. Load: save the data into a SQLite database table.
+connection = sqlite3.connect(database_file)
+df.to_sql("loan_records", connection, if_exists="replace", index=False)
+connection.close()
 
-    if "issue_d" in transformed.columns:
-        transformed["issue_d"] = pd.to_datetime(
-            transformed["issue_d"], errors="coerce"
-        ).dt.strftime("%Y-%m-%d")
-
-    if "earliest_cr_line" in transformed.columns:
-        transformed["earliest_cr_line"] = pd.to_datetime(
-            transformed["earliest_cr_line"], errors="coerce"
-        ).dt.strftime("%Y-%m-%d")
-
-    return transformed
+print(f"\nDatabase created at: {database_file}")
+print("Table name: loan_records")
 
 
-def load_data(df: pd.DataFrame) -> None:
-    with sqlite3.connect(DB_PATH) as connection:
-        df.to_sql("loan_records", connection, if_exists="replace", index=False)
+# 5. Save a short ETL report.
+etl_lines = [
+    "# ETL Process",
+    "",
+    "## Extract",
+    "- Loaded `processed_lending_club_loan.csv` from the data folder.",
+    f"- Records extracted: {len(df)}",
+    "",
+    "## Transform",
+    "- Converted date fields into YYYY-MM-DD format.",
+    "- Kept the cleaned columns from preprocessing.",
+    "",
+    "## Load",
+    "- Loaded the data into SQLite database `loan_risk.db`.",
+    "- Table name: `loan_records`.",
+]
 
-
-def write_etl_report(row_count: int, column_count: int) -> None:
-    lines = [
-        "# ETL Process",
-        "",
-        "## Extract",
-        "- Source file: `data/processed_lending_club_loan.csv`",
-        f"- Records extracted: {row_count}",
-        "",
-        "## Transform",
-        "- Parsed and standardized date fields for database storage",
-        "- Preserved engineered fields such as `default_flag` and `default_stage`",
-        "- Kept cleaned and selected features from preprocessing",
-        "",
-        "## Load",
-        "- Target database: `data/loan_risk.db`",
-        "- Target table: `loan_records`",
-        f"- Columns loaded: {column_count}",
-        "",
-        "## ETL Summary",
-        "- Extract: processed CSV loaded from the data folder",
-        "- Transform: final formatting and date normalization for storage",
-        "- Load: records inserted into SQLite for analytics and later dashboard use",
-    ]
-    ETL_REPORT_PATH.write_text("\n".join(lines), encoding="utf-8")
-
-
-def main() -> None:
-    print_heading("STEP 1: EXTRACT")
-    df = extract_data()
-    print("Processed dataset loaded")
-    print("Shape:", df.shape)
-    print(df.head())
-
-    print_heading("STEP 2: TRANSFORM")
-    transformed_df = transform_data(df)
-    print("Date columns standardized for SQLite storage")
-    print(transformed_df[["issue_d", "earliest_cr_line"]].head())
-
-    print_heading("STEP 3: LOAD")
-    load_data(transformed_df)
-    write_etl_report(len(transformed_df), len(transformed_df.columns))
-    print(f"Database created at: {DB_PATH}")
-    print("Table loaded: loan_records")
-    print(f"ETL report saved to: {ETL_REPORT_PATH}")
-
-
-if __name__ == "__main__":
-    main()
+etl_report_file.write_text("\n".join(etl_lines), encoding="utf-8")
+print(f"ETL report saved to: {etl_report_file}")

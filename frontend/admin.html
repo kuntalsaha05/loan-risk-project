@@ -46,14 +46,14 @@
       </div>
     </div>
 
-    <div class="card" style="margin-bottom: 40px;">
+    <div class="card mb-40">
       <h2>📊 Risk Distribution Overview</h2>
       <div class="chart-container">
         <canvas id="adminRiskChart"></canvas>
       </div>
     </div>
 
-    <div class="grid-2" style="margin-bottom: 40px;">
+    <div class="grid-2 mb-40">
       <div class="card">
         <h2>🎯 Loan Status Distribution</h2>
         <div class="chart-container">
@@ -81,7 +81,7 @@
                 <div class="fs-0-9rem color-muted">41,823 borrowers</div>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <div class="metric-stack">
               <span class="badge badge-info">34.85% share</span>
               <span class="badge badge-success">11.99% default</span>
             </div>
@@ -89,13 +89,13 @@
 
           <div class="p-16 border-bottom flex justify-between items-center">
             <div class="flex gap-8 items-center">
-              <span class="fs-1-5rem">\u26a0\ufe0f</span>
+              <span class="fs-1-5rem">&#9888;&#65039;</span>
               <div>
                 <div class="fw-600">Medium Risk</div>
                 <div class="fs-0-9rem color-muted">29,702 borrowers</div>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <div class="metric-stack">
               <span class="badge badge-info">24.75% share</span>
               <span class="badge badge-warning">18.93% default</span>
             </div>
@@ -109,7 +109,7 @@
                 <div class="fs-0-9rem color-muted">48,475 borrowers</div>
               </div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <div class="metric-stack">
               <span class="badge badge-info">40.40% share</span>
               <span class="badge badge-danger">26.73% default</span>
             </div>
@@ -119,58 +119,58 @@
 
       <div class="card">
         <h2>🔧 System Status</h2>
-        <div style="padding: 0;">
-          <div style="padding: 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
+        <div class="p-0">
+          <div class="status-row status-row-divider">
             <div>
-              <div style="font-weight: 600;">Database Status</div>
-              <div style="font-size: 0.9rem; color: var(--muted);">SQLite Active</div>
+              <div class="fw-600">Database Status</div>
+              <div class="fs-0-9rem color-muted">SQLite Active</div>
             </div>
-            <span style="display: inline-block; width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span>
+            <span class="status-dot"></span>
           </div>
 
-          <div style="padding: 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
+          <div class="status-row status-row-divider">
             <div>
-              <div style="font-weight: 600;">ML Models</div>
-              <div style="font-size: 0.9rem; color: var(--muted);">3 Models Running</div>
+              <div class="fw-600">ML Models</div>
+              <div class="fs-0-9rem color-muted">3 Models Running</div>
             </div>
-            <span style="display: inline-block; width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span>
+            <span class="status-dot"></span>
           </div>
 
-          <div style="padding: 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
+          <div class="status-row status-row-divider">
             <div>
-              <div style="font-weight: 600;">API Status</div>
-              <div style="font-size: 0.9rem; color: var(--muted);">System Ready</div>
+              <div class="fw-600">API Status</div>
+              <div class="fs-0-9rem color-muted">System Ready</div>
             </div>
-            <span style="display: inline-block; width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span>
+            <span class="status-dot"></span>
           </div>
 
-          <div style="padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div class="status-row">
             <div>
-              <div style="font-weight: 600;">Frontend</div>
-              <div style="font-size: 0.9rem; color: var(--muted);">Live & Responsive</div>
+              <div class="fw-600">Frontend</div>
+              <div class="fs-0-9rem color-muted">Live & Responsive</div>
             </div>
-            <span style="display: inline-block; width: 12px; height: 12px; background: var(--success); border-radius: 50%;"></span>
+            <span class="status-dot"></span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card" style="margin-bottom: 40px;">
+    <div class="card mb-40">
       <h2>💼 Recent Activity</h2>
-      <div style="padding: 0;">
-        <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 0.9rem; color: var(--muted);">
+      <div class="p-0">
+        <div class="activity-row activity-row-divider">
           📌 1,234 predictions executed today
         </div>
-        <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 0.9rem; color: var(--muted);">
+        <div class="activity-row activity-row-divider">
           📊 Dashboard accessed 3,456 times this week
         </div>
-        <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 0.9rem; color: var(--muted);">
+        <div class="activity-row activity-row-divider">
           ✅ All systems operational - 99.99% uptime
         </div>
-        <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 0.9rem; color: var(--muted);">
+        <div class="activity-row activity-row-divider">
           🔄 Last data sync: 2 hours ago
         </div>
-        <div style="padding: 12px 16px; font-size: 0.9rem; color: var(--muted);">
+        <div class="activity-row">
           🎯 Model accuracy: 80.17% (Decision Tree)
         </div>
       </div>
@@ -179,27 +179,27 @@
     <div class="grid-2">
       <div class="card">
         <h2>🎯 Top Performers</h2>
-        <div style="padding: 0;">
-          <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between;">
+        <div class="p-0">
+          <div class="performer-row performer-row-divider">
             <div>
               <strong>1. Decision Tree</strong>
-              <div style="font-size: 0.85rem; color: var(--muted);">F1: 14.76%</div>
+              <div class="fs-0-85rem color-muted">F1: 14.76%</div>
             </div>
             <span class="badge badge-success">Best</span>
           </div>
 
-          <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between;">
+          <div class="performer-row performer-row-divider">
             <div>
               <strong>2. Logistic Regression</strong>
-              <div style="font-size: 0.85rem; color: var(--muted);">Accuracy: 80.56%</div>
+              <div class="fs-0-85rem color-muted">Accuracy: 80.56%</div>
             </div>
             <span class="badge badge-info">Good</span>
           </div>
 
-          <div style="padding: 12px 16px; display: flex; justify-content: space-between;">
+          <div class="performer-row">
             <div>
               <strong>3. Random Forest</strong>
-              <div style="font-size: 0.85rem; color: var(--muted);">Accuracy: 80.47%</div>
+              <div class="fs-0-85rem color-muted">Accuracy: 80.47%</div>
             </div>
             <span class="badge badge-info">Good</span>
           </div>
@@ -208,54 +208,54 @@
 
       <div class="card">
         <h2>📚 Key Metrics</h2>
-        <div style="padding: 0;">
-          <div style="padding: 12px 16px; border-bottom: 1px solid var(--line);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <div class="p-0">
+          <div class="metric-row metric-row-divider">
+            <div class="flex justify-between mb-4">
               <span>Model Accuracy</span>
-              <span style="font-weight: 600;">80.17%</span>
+              <span class="fw-600">80.17%</span>
             </div>
-            <div style="background: var(--line); height: 6px; border-radius: 3px; overflow: hidden;">
-              <div style="background: var(--success); width: 80%; height: 100%;"></div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-success w-80"></div>
             </div>
           </div>
 
-          <div style="padding: 12px 16px; border-bottom: 1px solid var(--line);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <div class="metric-row metric-row-divider">
+            <div class="flex justify-between mb-4">
               <span>Data Coverage</span>
-              <span style="font-weight: 600;">100%</span>
+              <span class="fw-600">100%</span>
             </div>
-            <div style="background: var(--line); height: 6px; border-radius: 3px; overflow: hidden;">
-              <div style="background: var(--success); width: 100%; height: 100%;"></div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-success w-100"></div>
             </div>
           </div>
 
-          <div style="padding: 12px 16px; border-bottom: 1px solid var(--line);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <div class="metric-row metric-row-divider">
+            <div class="flex justify-between mb-4">
               <span>System Health</span>
-              <span style="font-weight: 600;">99.99%</span>
+              <span class="fw-600">99.99%</span>
             </div>
-            <div style="background: var(--line); height: 6px; border-radius: 3px; overflow: hidden;">
-              <div style="background: var(--success); width: 99%; height: 100%;"></div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-success w-99"></div>
             </div>
           </div>
 
-          <div style="padding: 12px 16px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <div class="metric-row">
+            <div class="flex justify-between mb-4">
               <span>API Response</span>
-              <span style="font-weight: 600;">245ms</span>
+              <span class="fw-600">245ms</span>
             </div>
-            <div style="background: var(--line); height: 6px; border-radius: 3px; overflow: hidden;">
-              <div style="background: var(--accent); width: 60%; height: 100%;"></div>
+            <div class="progress-track">
+              <div class="progress-fill progress-fill-accent w-60"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card" style="margin-top: 40px; padding: 24px; text-align: center; background: linear-gradient(135deg, rgba(217, 122, 78, 0.1), rgba(43, 95, 87, 0.1)); border: 2px solid var(--primary);">
+    <div class="card admin-help-card">
       <h3>📞 Need Help?</h3>
       <p>Contact the development team or check the documentation for system administration guides.</p>
-      <a href="#" class="btn btn-primary" style="margin-top: 16px;">View Documentation</a>
+      <a href="#" class="btn btn-primary mt-16">View Documentation</a>
     </div>
   </main>
 

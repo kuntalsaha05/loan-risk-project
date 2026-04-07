@@ -1,11 +1,9 @@
 # Association Rule Mining
 
 ## Method
-- Used Apriori-based frequent itemset mining
-- Converted continuous fields into categorical buckets
-- Generated rules using support, confidence, and lift
-
-## Top Rules
+- Used Apriori algorithm.
+- Converted numeric values into low, medium, and high buckets.
+- Used support, confidence, and lift to evaluate rules.
 
 | Antecedent | Consequent | Support | Confidence | Lift |
 | --- | --- | --- | --- | --- |
@@ -29,8 +27,3 @@
 | credit_history_bucket_credit_history=medium, grade_bucket_grade=A | default_bucket_default=no, interest_bucket_interest=low | 0.0521 | 0.9418 | 3.0910 |
 | grade_bucket_grade=A, loan_bucket_loan=medium, term_bucket_term=short | default_bucket_default=no, interest_bucket_interest=low | 0.0524 | 0.9402 | 3.0856 |
 | grade_bucket_grade=A, loan_bucket_loan=medium | default_bucket_default=no, interest_bucket_interest=low | 0.0536 | 0.9393 | 3.0828 |
-
-## Interpretation
-- Higher lift indicates a stronger relationship than random chance.
-- Rules ending in `default=yes` help identify risky borrower profiles.
-- Rules ending in `default=no` help identify safer borrower profiles.

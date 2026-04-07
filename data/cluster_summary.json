@@ -6,31 +6,28 @@
   },
   "clusters": [
     {
-      "risk_cluster": "high_risk",
-      "records": 48475,
-      "avg_loan_amnt": 11546.9061,
-      "avg_int_rate": 15.8414,
-      "avg_annual_inc": 53079.8509,
-      "avg_dti": 21.8083,
-      "default_rate": 0.2673
-    },
-    {
-      "risk_cluster": "low_risk",
+      "cluster_id": 1,
       "records": 41823,
-      "avg_loan_amnt": 10186.7555,
-      "avg_int_rate": 10.762,
-      "avg_annual_inc": 63135.6581,
-      "avg_dti": 13.1036,
-      "default_rate": 0.1199
+      "default_rate": 0.1198861870262774,
+      "avg_int_rate": 10.761996509097864,
+      "avg_dti": 13.103613561915694,
+      "risk_score": 0.3839221421974229
     },
     {
-      "risk_cluster": "medium_risk",
+      "cluster_id": 2,
       "records": 29702,
-      "avg_loan_amnt": 23925.3485,
-      "avg_int_rate": 14.2097,
-      "avg_annual_inc": 111146.7524,
-      "avg_dti": 16.0167,
-      "default_rate": 0.1893
+      "default_rate": 0.18928018315264966,
+      "avg_int_rate": 14.209713150629588,
+      "avg_dti": 16.016690121877314,
+      "risk_score": 0.5106265016525139
+    },
+    {
+      "cluster_id": 0,
+      "records": 48475,
+      "default_rate": 0.26729241877256316,
+      "avg_int_rate": 15.84135327488396,
+      "avg_dti": 21.808320990201135,
+      "risk_score": 0.6336462093862816
     }
   ]
 }

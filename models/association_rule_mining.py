@@ -1,182 +1,161 @@
 from pathlib import Path
 import sys
 
-
 try:
     import pandas as pd
     from mlxtend.frequent_patterns import apriori, association_rules
 except ModuleNotFoundError:
-    print(
-        "Missing dependencies for association rule mining.\n"
-        "Install project dependencies first, for example:\n"
-        "pip install -r backend/requirements.txt"
-    )
+    print("Required association rule libraries are missing. Run: pip install -r backend/requirements.txt")
     sys.exit(1)
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = BASE_DIR / "data"
-REPORT_DIR = BASE_DIR / "report"
-RAW_PROCESSED_PATH = DATA_DIR / "processed_lending_club_loan.csv"
-RULES_OUTPUT_PATH = DATA_DIR / "association_rules.csv"
-REPORT_OUTPUT_PATH = REPORT_DIR / "ASSOCIATION_RULES.md"
+# 1. Set file paths.
+base_dir = Path(__file__).resolve().parents[1]
+data_dir = base_dir / "data"
+report_dir = base_dir / "report"
+
+processed_file = data_dir / "processed_lending_club_loan.csv"
+rules_file = data_dir / "association_rules.csv"
+report_file = report_dir / "ASSOCIATION_RULES.md"
 
 
-def print_heading(title: str) -> None:
-    print("\n" + "=" * 70)
-    print(title)
-    print("=" * 70)
+# 2. Load the processed dataset.
+df = pd.read_csv(processed_file, low_memory=False)
+print("Dataset loaded:")
+print(df.shape)
 
 
-def load_data() -> pd.DataFrame:
-    if not RAW_PROCESSED_PATH.exists():
-        raise FileNotFoundError(f"Processed dataset not found: {RAW_PROCESSED_PATH}")
-    return pd.read_csv(RAW_PROCESSED_PATH, low_memory=False)
+# 3. Convert numeric columns into low, medium, and high buckets.
+transactions = pd.DataFrame(index=df.index)
 
+bucket_columns = {
+    "income": "annual_inc",
+    "loan": "loan_amnt",
+    "dti": "dti",
+    "interest": "int_rate",
+    "credit_history": "credit_history_years",
+}
 
-def bucket_feature(series: pd.Series, label: str) -> pd.Series:
-    low = series.quantile(0.33)
-    high = series.quantile(0.67)
+for bucket_name, column_name in bucket_columns.items():
+    low_value = df[column_name].quantile(0.33)
+    high_value = df[column_name].quantile(0.67)
+    bucket_values = []
 
-    def assign_bucket(value: float) -> str:
+    for value in df[column_name]:
         if pd.isna(value):
-            return f"{label}=unknown"
-        if value <= low:
-            return f"{label}=low"
-        if value <= high:
-            return f"{label}=medium"
-        return f"{label}=high"
+            bucket_values.append(f"{bucket_name}=unknown")
+        elif value <= low_value:
+            bucket_values.append(f"{bucket_name}=low")
+        elif value <= high_value:
+            bucket_values.append(f"{bucket_name}=medium")
+        else:
+            bucket_values.append(f"{bucket_name}=high")
 
-    return series.apply(assign_bucket)
-
-
-def build_transaction_frame(df: pd.DataFrame) -> pd.DataFrame:
-    transactions = pd.DataFrame(index=df.index)
-    transactions["income_bucket"] = bucket_feature(df["annual_inc"], "income")
-    transactions["loan_bucket"] = bucket_feature(df["loan_amnt"], "loan")
-    transactions["dti_bucket"] = bucket_feature(df["dti"], "dti")
-    transactions["interest_bucket"] = bucket_feature(df["int_rate"], "interest")
-    transactions["credit_history_bucket"] = bucket_feature(
-        df["credit_history_years"], "credit_history"
-    )
-    transactions["term_bucket"] = df["term"].apply(
-        lambda value: "term=short" if value <= 36 else "term=long"
-    )
-    transactions["grade_bucket"] = df["grade"].astype(str).apply(lambda value: f"grade={value}")
-    transactions["purpose_bucket"] = df["purpose"].astype(str).apply(
-        lambda value: f"purpose={value}"
-    )
-    transactions["default_bucket"] = df["default_flag"].apply(
-        lambda value: "default=yes" if value == 1 else "default=no"
-    )
-    return transactions
+    transactions[f"{bucket_name}_bucket"] = bucket_values
 
 
-def encode_transactions(transactions: pd.DataFrame) -> pd.DataFrame:
-    encoded = pd.get_dummies(transactions)
-    return encoded.astype(bool)
+# 4. Convert other useful columns into transaction items.
+term_items = []
+for value in df["term"]:
+    if value <= 36:
+        term_items.append("term=short")
+    else:
+        term_items.append("term=long")
+transactions["term_bucket"] = term_items
+
+grade_items = []
+for value in df["grade"].astype(str):
+    grade_items.append(f"grade={value}")
+transactions["grade_bucket"] = grade_items
+
+purpose_items = []
+for value in df["purpose"].astype(str):
+    purpose_items.append(f"purpose={value}")
+transactions["purpose_bucket"] = purpose_items
+
+default_items = []
+for value in df["default_flag"]:
+    if value == 1:
+        default_items.append("default=yes")
+    else:
+        default_items.append("default=no")
+transactions["default_bucket"] = default_items
+
+print("\nTransaction data sample:")
+print(transactions.head())
 
 
-def mine_rules(encoded_transactions: pd.DataFrame) -> pd.DataFrame:
-    frequent_itemsets = apriori(
-        encoded_transactions, min_support=0.05, use_colnames=True
-    )
-    rules = association_rules(
-        frequent_itemsets, metric="confidence", min_threshold=0.6
-    )
-    if rules.empty:
-        return rules
+# 5. One-hot encode the transactions for Apriori.
+encoded_transactions = pd.get_dummies(transactions).astype(bool)
+print("\nEncoded transaction shape:")
+print(encoded_transactions.shape)
 
-    rules = rules.copy()
-    rules["antecedents"] = rules["antecedents"].apply(
-        lambda items: ", ".join(sorted(items))
-    )
-    rules["consequents"] = rules["consequents"].apply(
-        lambda items: ", ".join(sorted(items))
-    )
 
-    filtered = rules[
+# 6. Apply Apriori and generate association rules.
+frequent_itemsets = apriori(encoded_transactions, min_support=0.05, use_colnames=True)
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.6)
+
+print("\nNumber of rules found:")
+print(len(rules))
+
+
+# 7. Keep rules related to default prediction.
+if not rules.empty:
+    antecedent_text = []
+    consequent_text = []
+
+    for items in rules["antecedents"]:
+        antecedent_text.append(", ".join(sorted(items)))
+
+    for items in rules["consequents"]:
+        consequent_text.append(", ".join(sorted(items)))
+
+    rules["antecedents"] = antecedent_text
+    rules["consequents"] = consequent_text
+
+    default_rules = rules[
         rules["consequents"].str.contains("default=yes|default=no", regex=True)
-    ].sort_values(by=["lift", "confidence", "support"], ascending=False)
-
-    return filtered[
+    ]
+    default_rules = default_rules.sort_values(
+        by=["lift", "confidence", "support"], ascending=False
+    )
+    final_rules = default_rules[
         ["antecedents", "consequents", "support", "confidence", "lift"]
     ].head(20)
+else:
+    final_rules = rules
+
+print("\nTop association rules:")
+print(final_rules)
 
 
-def write_report(rules: pd.DataFrame) -> None:
-    lines = [
-        "# Association Rule Mining",
-        "",
-        "## Method",
-        "- Used Apriori-based frequent itemset mining",
-        "- Converted continuous fields into categorical buckets",
-        "- Generated rules using support, confidence, and lift",
-        "",
-    ]
+# 8. Save association rules.
+final_rules.to_csv(rules_file, index=False)
+print(f"\nAssociation rules saved to: {rules_file}")
 
-    if rules.empty:
-        lines.extend(
-            [
-                "## Result",
-                "- No rules met the current support and confidence thresholds.",
-            ]
-        )
-    else:
-        lines.extend(
-            [
-                "## Top Rules",
-                "",
-                "| Antecedent | Consequent | Support | Confidence | Lift |",
-                "| --- | --- | --- | --- | --- |",
-            ]
-        )
-        for _, row in rules.iterrows():
-            lines.append(
-                f"| {row['antecedents']} | {row['consequents']} | "
-                f"{row['support']:.4f} | {row['confidence']:.4f} | {row['lift']:.4f} |"
-            )
 
-        lines.extend(
-            [
-                "",
-                "## Interpretation",
-                "- Higher lift indicates a stronger relationship than random chance.",
-                "- Rules ending in `default=yes` help identify risky borrower profiles.",
-                "- Rules ending in `default=no` help identify safer borrower profiles.",
-            ]
+# 9. Save association rule report.
+lines = [
+    "# Association Rule Mining",
+    "",
+    "## Method",
+    "- Used Apriori algorithm.",
+    "- Converted numeric values into low, medium, and high buckets.",
+    "- Used support, confidence, and lift to evaluate rules.",
+    "",
+]
+
+if final_rules.empty:
+    lines.append("No rules were found with the selected support and confidence values.")
+else:
+    lines.append("| Antecedent | Consequent | Support | Confidence | Lift |")
+    lines.append("| --- | --- | --- | --- | --- |")
+
+    for _, row in final_rules.iterrows():
+        lines.append(
+            f"| {row['antecedents']} | {row['consequents']} | "
+            f"{row['support']:.4f} | {row['confidence']:.4f} | {row['lift']:.4f} |"
         )
 
-    REPORT_OUTPUT_PATH.write_text("\n".join(lines), encoding="utf-8")
-
-
-def main() -> None:
-    print_heading("STEP 1: LOAD PROCESSED DATA")
-    df = load_data()
-    print("Processed dataset loaded")
-    print("Shape:", df.shape)
-    print(df[["loan_amnt", "annual_inc", "dti", "int_rate", "term", "grade", "default_flag"]].head())
-
-    print_heading("STEP 2: CREATE TRANSACTION TABLE")
-    transactions = build_transaction_frame(df)
-    print("Continuous features converted into low / medium / high buckets")
-    print(transactions.head())
-
-    print_heading("STEP 3: ENCODE TRANSACTIONS")
-    encoded_transactions = encode_transactions(transactions)
-    print("Encoded transaction table shape:", encoded_transactions.shape)
-
-    print_heading("STEP 4: APPLY APRIORI AND GENERATE RULES")
-    rules = mine_rules(encoded_transactions)
-    print("Top association rules:")
-    print(rules.head(10) if not rules.empty else "No rules found with current thresholds")
-
-    print_heading("STEP 5: SAVE ASSOCIATION RULE OUTPUTS")
-    rules.to_csv(RULES_OUTPUT_PATH, index=False)
-    write_report(rules)
-    print(f"Association rules saved to: {RULES_OUTPUT_PATH}")
-    print(f"Association rule report saved to: {REPORT_OUTPUT_PATH}")
-
-
-if __name__ == "__main__":
-    main()
+report_file.write_text("\n".join(lines), encoding="utf-8")
+print(f"Association rule report saved to: {report_file}")

@@ -34,8 +34,7 @@
       "term": 36.0,
       "default_probability": 0.081,
       "default_stage": "non_default",
-      "risk_cluster": "low_risk",
-      "recommended_interest_rate": 10.5
+      "risk_cluster": "low_risk"
     },
     {
       "scenario": "lower_loan_amount",
@@ -44,8 +43,7 @@
       "term": 36.0,
       "default_probability": 0.081,
       "default_stage": "non_default",
-      "risk_cluster": "low_risk",
-      "recommended_interest_rate": 10.5
+      "risk_cluster": "low_risk"
     },
     {
       "scenario": "lower_dti",
@@ -54,8 +52,7 @@
       "term": 36.0,
       "default_probability": 0.0838,
       "default_stage": "non_default",
-      "risk_cluster": "low_risk",
-      "recommended_interest_rate": 10.5
+      "risk_cluster": "low_risk"
     },
     {
       "scenario": "shorter_term",
@@ -64,8 +61,7 @@
       "term": 36.0,
       "default_probability": 0.081,
       "default_stage": "non_default",
-      "risk_cluster": "low_risk",
-      "recommended_interest_rate": 10.5
+      "risk_cluster": "low_risk"
     }
   ]
 }

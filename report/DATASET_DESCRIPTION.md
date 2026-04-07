@@ -1,19 +1,16 @@
 # Dataset Description
 
-## Source File
-- `lending_club_loan_two.csv`
-
-## Shape
+- Source file: `lending_club_loan_two.csv`
 - Rows: 396030
 - Columns: 24
 
 ## Data Types
-- Structured data: CSV dataset
-- Quantitative data examples: loan amount, annual income, DTI
-- Nominal data examples: loan status, grade, purpose
-- Time-series related fields: issue date, earliest credit line
+- Structured data: CSV file
+- Quantitative data: loan amount, annual income, DTI
+- Nominal data: loan status, grade, purpose
+- Time-related data: issue date, earliest credit line
 
-## Current Project Features
+## Final Columns
 - `loan_amnt`: float64
 - `term`: float64
 - `int_rate`: float64

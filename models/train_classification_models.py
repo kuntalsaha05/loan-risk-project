@@ -2,7 +2,6 @@ from pathlib import Path
 import json
 import sys
 
-
 try:
     import pandas as pd
     from sklearn.compose import ColumnTransformer
@@ -15,211 +14,171 @@ try:
     from sklearn.preprocessing import OneHotEncoder, StandardScaler
     from sklearn.tree import DecisionTreeClassifier
 except ModuleNotFoundError:
-    print(
-        "Missing dependencies for model training.\n"
-        "Install project dependencies first, for example:\n"
-        "pip install -r backend/requirements.txt"
-    )
+    print("Required ML libraries are missing. Run: pip install -r backend/requirements.txt")
     sys.exit(1)
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = BASE_DIR / "data"
-REPORT_DIR = BASE_DIR / "report"
-PROCESSED_DATA_PATH = DATA_DIR / "processed_lending_club_loan.csv"
-METRICS_JSON_PATH = DATA_DIR / "classification_metrics.json"
-REPORT_PATH = REPORT_DIR / "CLASSIFICATION_RESULTS.md"
-MAX_SAMPLE_SIZE = 120000
+# 1. Set file paths.
+base_dir = Path(__file__).resolve().parents[1]
+data_dir = base_dir / "data"
+report_dir = base_dir / "report"
+
+processed_file = data_dir / "processed_lending_club_loan.csv"
+metrics_file = data_dir / "classification_metrics.json"
+report_file = report_dir / "CLASSIFICATION_RESULTS.md"
 
 
-def print_heading(title: str) -> None:
-    print("\n" + "=" * 70)
-    print(title)
-    print("=" * 70)
+# 2. Load the processed dataset.
+df = pd.read_csv(processed_file, low_memory=False)
+print("Dataset loaded:")
+print(df.shape)
 
 
-def load_data() -> pd.DataFrame:
-    if not PROCESSED_DATA_PATH.exists():
-        raise FileNotFoundError(f"Processed dataset not found: {PROCESSED_DATA_PATH}")
-    df = pd.read_csv(PROCESSED_DATA_PATH, low_memory=False)
-    if len(df) > MAX_SAMPLE_SIZE:
-        default_counts = df["default_flag"].value_counts(normalize=True)
-        sampled_parts = []
-        for class_value, class_fraction in default_counts.items():
-            class_rows = df[df["default_flag"] == class_value]
-            class_sample_size = max(1, int(round(MAX_SAMPLE_SIZE * class_fraction)))
-            class_sample_size = min(class_sample_size, len(class_rows))
-            sampled_parts.append(
-                class_rows.sample(n=class_sample_size, random_state=42)
-            )
-        df = pd.concat(sampled_parts, ignore_index=True)
-    return df.reset_index(drop=True)
+# 3. Take a sample to make training faster.
+max_sample_size = 120000
+if len(df) > max_sample_size:
+    df = df.sample(n=max_sample_size, random_state=42)
+
+print("\nDataset shape after sampling:")
+print(df.shape)
 
 
-def prepare_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
-    feature_columns = [
-        "loan_amnt",
-        "term",
-        "int_rate",
-        "installment",
-        "grade",
-        "sub_grade",
-        "annual_inc",
-        "verification_status",
-        "purpose",
-        "dti",
-        "open_acc",
-        "pub_rec",
-        "revol_bal",
-        "revol_util",
-        "mort_acc",
-        "pub_rec_bankruptcies",
-        "issue_year",
-        "issue_month",
-        "credit_history_years",
+# 4. Select input features and target column.
+feature_columns = [
+    "loan_amnt",
+    "term",
+    "int_rate",
+    "installment",
+    "grade",
+    "sub_grade",
+    "annual_inc",
+    "verification_status",
+    "purpose",
+    "dti",
+    "open_acc",
+    "pub_rec",
+    "revol_bal",
+    "revol_util",
+    "mort_acc",
+    "pub_rec_bankruptcies",
+    "issue_year",
+    "issue_month",
+    "credit_history_years",
+]
+
+available_features = []
+for column in feature_columns:
+    if column in df.columns:
+        available_features.append(column)
+
+X = df[available_features]
+y = df["default_flag"]
+
+print("\nFeature columns:")
+print(available_features)
+print("\nTarget distribution:")
+print(y.value_counts(normalize=True))
+
+
+# 5. Split the data into training and testing data.
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+
+# 6. Prepare numeric and categorical columns.
+categorical_columns = X.select_dtypes(include=["object", "string"]).columns.tolist()
+numeric_columns = []
+for column in X.columns:
+    if column not in categorical_columns:
+        numeric_columns.append(column)
+
+numeric_pipeline = Pipeline(
+    steps=[
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler()),
     ]
+)
 
-    available_features = [column for column in feature_columns if column in df.columns]
-    X = df[available_features].copy()
-    y = df["default_flag"].copy()
-    return X, y
+categorical_pipeline = Pipeline(
+    steps=[
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("encoder", OneHotEncoder(handle_unknown="ignore")),
+    ]
+)
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", numeric_pipeline, numeric_columns),
+        ("cat", categorical_pipeline, categorical_columns),
+    ]
+)
 
 
-def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
-    categorical_columns = X.select_dtypes(include=["object", "string"]).columns.tolist()
-    numeric_columns = [column for column in X.columns if column not in categorical_columns]
+# 7. Create the three classification models.
+models = {
+    "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
+    "Decision Tree": DecisionTreeClassifier(max_depth=8, random_state=42),
+    "Random Forest": RandomForestClassifier(
+        n_estimators=150, max_depth=12, random_state=42, n_jobs=1
+    ),
+}
 
-    numeric_pipeline = Pipeline(
+
+# 8. Train and evaluate each model.
+results = {}
+for model_name, model in models.items():
+    pipeline = Pipeline(
         steps=[
-            ("imputer", SimpleImputer(strategy="median")),
-            ("scaler", StandardScaler()),
+            ("preprocessor", preprocessor),
+            ("model", model),
         ]
     )
 
-    categorical_pipeline = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            ("encoder", OneHotEncoder(handle_unknown="ignore")),
-        ]
-    )
+    pipeline.fit(X_train, y_train)
+    predictions = pipeline.predict(X_test)
 
-    return ColumnTransformer(
-        transformers=[
-            ("num", numeric_pipeline, numeric_columns),
-            ("cat", categorical_pipeline, categorical_columns),
-        ]
-    )
+    accuracy = accuracy_score(y_test, predictions)
+    f1 = f1_score(y_test, predictions, zero_division=0)
+    report = classification_report(y_test, predictions, zero_division=0)
 
-
-def train_and_evaluate(X: pd.DataFrame, y: pd.Series) -> dict:
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
-
-    preprocessor = build_preprocessor(X)
-
-    models = {
-        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
-        "Decision Tree": DecisionTreeClassifier(max_depth=8, random_state=42),
-        "Random Forest": RandomForestClassifier(
-            n_estimators=150, max_depth=12, random_state=42, n_jobs=1
-        ),
+    results[model_name] = {
+        "accuracy": round(accuracy, 4),
+        "f1_score": round(f1, 4),
+        "classification_report": report,
     }
 
-    results = {}
-    for model_name, estimator in models.items():
-        pipeline = Pipeline(
-            steps=[
-                ("preprocessor", preprocessor),
-                ("model", estimator),
-            ]
-        )
-
-        pipeline.fit(X_train, y_train)
-        predictions = pipeline.predict(X_test)
-
-        results[model_name] = {
-            "accuracy": round(accuracy_score(y_test, predictions), 4),
-            "f1_score": round(f1_score(y_test, predictions, zero_division=0), 4),
-            "classification_report": classification_report(
-                y_test, predictions, zero_division=0
-            ),
-        }
-
-    return results
+print("\nModel comparison:")
+print(pd.DataFrame(results).T[["accuracy", "f1_score"]])
 
 
-def write_report(results: dict) -> None:
-    lines = [
-        "# Classification Results",
-        "",
-        "## Models Used",
-        "- Logistic Regression",
-        "- Decision Tree",
-        "- Random Forest",
-        "",
-        "## Evaluation Summary",
-        "",
-        "| Model | Accuracy | F1 Score |",
-        "| --- | --- | --- |",
-    ]
+# 9. Save the metrics as JSON.
+metrics_file.write_text(json.dumps(results, indent=2), encoding="utf-8")
+print(f"\nClassification metrics saved to: {metrics_file}")
 
-    for model_name, metrics in results.items():
-        lines.append(
-            f"| {model_name} | {metrics['accuracy']:.4f} | {metrics['f1_score']:.4f} |"
-        )
 
-    best_model = max(results.items(), key=lambda item: item[1]["f1_score"])
-    lines.extend(
-        [
-            "",
-            "## Best Model",
-            f"- Based on F1 score, the best model is `{best_model[0]}`.",
-            "",
-            "## Detailed Reports",
-        ]
+# 10. Save the report as Markdown.
+lines = [
+    "# Classification Results",
+    "",
+    "| Model | Accuracy | F1 Score |",
+    "| --- | --- | --- |",
+]
+
+for model_name, metrics in results.items():
+    lines.append(
+        f"| {model_name} | {metrics['accuracy']:.4f} | {metrics['f1_score']:.4f} |"
     )
 
-    for model_name, metrics in results.items():
-        lines.extend(
-            [
-                "",
-                f"### {model_name}",
-                "```text",
-                metrics["classification_report"].rstrip(),
-                "```",
-            ]
-        )
+lines.append("")
+lines.append("## Detailed Reports")
 
-    REPORT_PATH.write_text("\n".join(lines), encoding="utf-8")
+for model_name, metrics in results.items():
+    lines.append("")
+    lines.append(f"### {model_name}")
+    lines.append("```text")
+    lines.append(metrics["classification_report"].rstrip())
+    lines.append("```")
 
-
-def main() -> None:
-    print_heading("STEP 1: LOAD PROCESSED DATA")
-    df = load_data()
-    print("Training dataset loaded")
-    print("Shape after sampling:", df.shape)
-    print("Target distribution:")
-    print(df["default_flag"].value_counts(normalize=True))
-
-    print_heading("STEP 2: SELECT FEATURES AND TARGET")
-    X, y = prepare_features(df)
-    print("Feature columns:")
-    print(X.columns.tolist())
-    print("Target column: default_flag")
-    print(X.head())
-
-    print_heading("STEP 3: TRAIN SUPERVISED LEARNING MODELS")
-    results = train_and_evaluate(X, y)
-    print("Model comparison:")
-    print(pd.DataFrame(results).T[["accuracy", "f1_score"]])
-
-    print_heading("STEP 4: SAVE CLASSIFICATION OUTPUTS")
-    METRICS_JSON_PATH.write_text(json.dumps(results, indent=2), encoding="utf-8")
-    write_report(results)
-    print(f"Classification metrics saved to: {METRICS_JSON_PATH}")
-    print(f"Classification report saved to: {REPORT_PATH}")
-
-
-if __name__ == "__main__":
-    main()
+report_file.write_text("\n".join(lines), encoding="utf-8")
+print(f"Classification report saved to: {report_file}")

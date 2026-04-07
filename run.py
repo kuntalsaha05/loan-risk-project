@@ -1,61 +1,42 @@
-"""
-run.py - Full pipeline runner for the Loan Risk Project.
-
-Runs each stage in order:
-  1. Data preprocessing
-  2. ETL / database load
-  3. Classification model training
-  4. K-Means clustering
-  5. Association rule mining
-  6. Visualization generation
-  7. System demo (prediction + what-if simulation)
-
-Usage:
-    python run.py
-"""
-
 import subprocess
 import sys
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
 
-STEPS = [
-    ("Preprocessing data", [sys.executable, "backend/preprocess_data.py"]),
-    ("Loading data into database", [sys.executable, "backend/load_to_database.py"]),
-    ("Training classification models", [sys.executable, "models/train_classification_models.py"]),
-    ("Running K-Means clustering", [sys.executable, "models/kmeans_clustering.py"]),
-    ("Mining association rules", [sys.executable, "models/association_rule_mining.py"]),
-    ("Generating visualizations", [sys.executable, "models/generate_visualizations.py"]),
-    ("Running system demo", [sys.executable, "backend/loan_risk_system.py"]),
+# 1. Set the project folder.
+base_dir = Path(__file__).resolve().parent
+
+
+# 2. List all scripts in the order they should run.
+steps = [
+    ["Preprocessing data", "backend/preprocess_data.py"],
+    ["Loading data into database", "backend/load_to_database.py"],
+    ["Training classification models", "models/train_classification_models.py"],
+    ["Running K-Means clustering", "models/kmeans_clustering.py"],
+    ["Mining association rules", "models/association_rule_mining.py"],
+    ["Generating visualizations", "models/generate_visualizations.py"],
+    ["Running system demo", "backend/loan_risk_system.py"],
 ]
 
 
-def run_step(label: str, command: list[str]) -> bool:
-    print(f"\n{'=' * 60}")
-    print(f"  {label}")
-    print(f"{'=' * 60}")
-    result = subprocess.run(command, cwd=BASE_DIR)
-    if result.returncode != 0:
-        print(f"\n[ERROR] Step failed: {label}")
-        return False
-    return True
+# 3. Run each script one by one.
+print("Loan Risk Project - Full Pipeline")
 
-
-def main() -> None:
-    print("Loan Risk Project - Full Pipeline Runner")
-    print("=========================================")
-
-    for label, command in STEPS:
-        if not run_step(label, command):
-            print("\nPipeline stopped due to an error.")
-            sys.exit(1)
+for step in steps:
+    step_name = step[0]
+    script_path = step[1]
 
     print("\n" + "=" * 60)
-    print("  Pipeline complete.")
+    print(step_name)
     print("=" * 60)
-    print("\nOpen frontend/index.html in a browser to view the dashboard.")
+
+    result = subprocess.run([sys.executable, script_path], cwd=base_dir)
+
+    if result.returncode != 0:
+        print(f"Stopped because this step failed: {step_name}")
+        sys.exit(1)
 
 
-if __name__ == "__main__":
-    main()
+# 4. Show final message.
+print("\nPipeline completed successfully.")
+print("Open frontend/index.html to view the dashboard.")
