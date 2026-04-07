@@ -136,11 +136,13 @@ Borrowers were grouped into:
 - high risk
 
 ### Cluster Summary
-| Risk Cluster | Records | Avg Default Flag |
+| Risk Cluster | Records | Default Rate |
 | --- | --- | --- |
-| low_risk | 64794 | 0.0000 |
-| medium_risk | 32769 | 0.0354 |
-| high_risk | 22437 | 0.9997 |
+| low_risk | 41823 | 0.1199 |
+| medium_risk | 29702 | 0.1893 |
+| high_risk | 48475 | 0.2673 |
+
+The clustering was corrected to avoid using `default_flag` as an input feature. The default rate is now measured after clustering for interpretation only.
 
 This satisfies the Unit IV clustering requirement.
 

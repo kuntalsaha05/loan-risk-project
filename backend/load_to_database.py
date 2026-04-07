@@ -21,6 +21,12 @@ DB_PATH = DATA_DIR / "loan_risk.db"
 ETL_REPORT_PATH = BASE_DIR / "report" / "ETL_PROCESS.md"
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 def extract_data() -> pd.DataFrame:
     if not PROCESSED_DATA_PATH.exists():
         raise FileNotFoundError(f"Processed dataset not found: {PROCESSED_DATA_PATH}")
@@ -75,8 +81,18 @@ def write_etl_report(row_count: int, column_count: int) -> None:
 
 
 def main() -> None:
+    print_heading("STEP 1: EXTRACT")
     df = extract_data()
+    print("Processed dataset loaded")
+    print("Shape:", df.shape)
+    print(df.head())
+
+    print_heading("STEP 2: TRANSFORM")
     transformed_df = transform_data(df)
+    print("Date columns standardized for SQLite storage")
+    print(transformed_df[["issue_d", "earliest_cr_line"]].head())
+
+    print_heading("STEP 3: LOAD")
     load_data(transformed_df)
     write_etl_report(len(transformed_df), len(transformed_df.columns))
     print(f"Database created at: {DB_PATH}")

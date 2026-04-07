@@ -29,6 +29,12 @@ SAMPLE_OUTPUT_PATH = DATA_DIR / "system_demo_output.json"
 MAX_SAMPLE_SIZE = 100000
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 class LoanRiskSystem:
     def __init__(self) -> None:
         self.feature_columns = [
@@ -59,11 +65,11 @@ class LoanRiskSystem:
             "dti",
             "revol_util",
             "credit_history_years",
-            "default_flag",
         ]
         self.default_model: Pipeline | None = None
         self.cluster_pipeline: Pipeline | None = None
         self.cluster_label_map: dict[int, str] = {}
+        self.training_default_flags: pd.Series | None = None
 
     def load_training_data(self) -> pd.DataFrame:
         if not PROCESSED_DATA_PATH.exists():
@@ -103,10 +109,18 @@ class LoanRiskSystem:
         )
 
     def fit(self) -> None:
+        print_heading("STEP 1: LOAD TRAINING DATA")
         df = self.load_training_data()
+        print("System training dataset loaded")
+        print("Shape after sampling:", df.shape)
 
+        print_heading("STEP 2: TRAIN DEFAULT PREDICTION MODEL")
         X = df[self.feature_columns].copy()
         y = df["default_flag"].copy()
+        print("Classification features:")
+        print(X.columns.tolist())
+        print("Target distribution:")
+        print(y.value_counts(normalize=True))
 
         self.default_model = Pipeline(
             steps=[
@@ -115,8 +129,14 @@ class LoanRiskSystem:
             ]
         )
         self.default_model.fit(X, y)
+        print("Decision Tree classifier trained")
 
+        print_heading("STEP 3: TRAIN RISK CLUSTER MODEL")
         cluster_df = df[self.cluster_features].copy()
+        self.training_default_flags = y.reset_index(drop=True)
+        print("Clustering features:")
+        print(cluster_df.columns.tolist())
+        print("Note: default_flag is used only to label clusters after K-Means.")
         self.cluster_pipeline = Pipeline(
             steps=[
                 ("imputer", SimpleImputer(strategy="median")),
@@ -126,15 +146,22 @@ class LoanRiskSystem:
         )
         cluster_ids = pd.Series(self.cluster_pipeline.fit_predict(cluster_df), index=cluster_df.index)
         self.cluster_label_map = self._build_cluster_label_map(cluster_df, cluster_ids)
+        print("Cluster label mapping:")
+        print(self.cluster_label_map)
 
     def _build_cluster_label_map(
         self, cluster_df: pd.DataFrame, cluster_ids: pd.Series
     ) -> dict[int, str]:
+        if self.training_default_flags is None:
+            raise RuntimeError("Training labels are not available for cluster mapping.")
         summary = (
-            cluster_df.assign(cluster_id=cluster_ids)
+            cluster_df.assign(
+                cluster_id=cluster_ids,
+                default_flag=self.training_default_flags.values,
+            )
             .groupby("cluster_id")
             .agg(
-                avg_default_flag=("default_flag", "mean"),
+                default_rate=("default_flag", "mean"),
                 avg_int_rate=("int_rate", "mean"),
                 avg_dti=("dti", "mean"),
             )
@@ -142,7 +169,7 @@ class LoanRiskSystem:
         )
 
         summary["risk_score"] = (
-            summary["avg_default_flag"] * 0.5
+            summary["default_rate"] * 0.5
             + summary["avg_int_rate"] / summary["avg_int_rate"].max() * 0.3
             + summary["avg_dti"] / summary["avg_dti"].max() * 0.2
         )
@@ -190,7 +217,6 @@ class LoanRiskSystem:
             "dti": profile["dti"],
             "revol_util": profile["revol_util"],
             "credit_history_years": profile["credit_history_years"],
-            "default_flag": int(default_probability >= 0.5),
         }
         cluster_df = pd.DataFrame([cluster_profile], columns=self.cluster_features)
         cluster_id = int(self.cluster_pipeline.predict(cluster_df)[0])
@@ -296,18 +322,29 @@ def write_system_report() -> None:
 
 
 def main() -> None:
+    print_heading("LOAN RISK SYSTEM DEMO")
     system = LoanRiskSystem()
     system.fit()
 
+    print_heading("STEP 4: BUILD DEMO BORROWER PROFILE")
     demo_profile = build_demo_profile()
+    print(demo_profile)
+
+    print_heading("STEP 5: PREDICT RISK AND RUN WHAT-IF SIMULATION")
     prediction = system.predict(demo_profile)
     simulation = system.what_if_simulation(demo_profile)
+    print("Prediction result:")
+    print(json.dumps(prediction, indent=2))
+    print("What-if simulation:")
+    print(json.dumps(simulation, indent=2))
 
     payload = {
         "input_profile": demo_profile,
         "prediction": prediction,
         "what_if_simulation": simulation,
     }
+
+    print_heading("STEP 6: SAVE SYSTEM OUTPUTS")
     SAMPLE_OUTPUT_PATH.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     write_system_report()
 

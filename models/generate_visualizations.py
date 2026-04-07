@@ -30,6 +30,12 @@ CLASSIFICATION_METRICS_PATH = DATA_DIR / "classification_metrics.json"
 VISUAL_REPORT_PATH = REPORT_DIR / "VISUALIZATION_SUMMARY.md"
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 def ensure_output_dir() -> None:
     VISUAL_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -151,19 +157,28 @@ def write_report(paths: list[Path]) -> None:
 
 
 def main() -> None:
+    print_heading("STEP 1: PREPARE VISUALIZATION FOLDER")
     ensure_output_dir()
     sns.set_theme(style="whitegrid")
+    print(f"Visual folder ready: {VISUAL_DIR}")
 
+    print_heading("STEP 2: LOAD DATA FOR CHARTS")
     processed_df = pd.read_csv(PROCESSED_DATA_PATH, low_memory=False)
     clustered_df = pd.read_csv(CLUSTERED_DATA_PATH, low_memory=False)
     association_df = pd.read_csv(ASSOCIATION_RULES_PATH)
+    print("Processed data shape:", processed_df.shape)
+    print("Clustered data shape:", clustered_df.shape)
+    print("Association rules shape:", association_df.shape)
 
+    print_heading("STEP 3: GENERATE VISUALIZATIONS")
     paths = [
         plot_risk_distribution(processed_df),
         plot_clusters(clustered_df),
         plot_association_rules(association_df),
         plot_feature_importance(),
     ]
+
+    print_heading("STEP 4: SAVE VISUALIZATION SUMMARY")
     write_report(paths)
 
     for path in paths:

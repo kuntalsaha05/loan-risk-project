@@ -32,6 +32,12 @@ REPORT_PATH = REPORT_DIR / "CLASSIFICATION_RESULTS.md"
 MAX_SAMPLE_SIZE = 120000
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 def load_data() -> pd.DataFrame:
     if not PROCESSED_DATA_PATH.exists():
         raise FileNotFoundError(f"Processed dataset not found: {PROCESSED_DATA_PATH}")
@@ -189,9 +195,26 @@ def write_report(results: dict) -> None:
 
 
 def main() -> None:
+    print_heading("STEP 1: LOAD PROCESSED DATA")
     df = load_data()
+    print("Training dataset loaded")
+    print("Shape after sampling:", df.shape)
+    print("Target distribution:")
+    print(df["default_flag"].value_counts(normalize=True))
+
+    print_heading("STEP 2: SELECT FEATURES AND TARGET")
     X, y = prepare_features(df)
+    print("Feature columns:")
+    print(X.columns.tolist())
+    print("Target column: default_flag")
+    print(X.head())
+
+    print_heading("STEP 3: TRAIN SUPERVISED LEARNING MODELS")
     results = train_and_evaluate(X, y)
+    print("Model comparison:")
+    print(pd.DataFrame(results).T[["accuracy", "f1_score"]])
+
+    print_heading("STEP 4: SAVE CLASSIFICATION OUTPUTS")
     METRICS_JSON_PATH.write_text(json.dumps(results, indent=2), encoding="utf-8")
     write_report(results)
     print(f"Classification metrics saved to: {METRICS_JSON_PATH}")

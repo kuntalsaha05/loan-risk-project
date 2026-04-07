@@ -22,6 +22,12 @@ RULES_OUTPUT_PATH = DATA_DIR / "association_rules.csv"
 REPORT_OUTPUT_PATH = REPORT_DIR / "ASSOCIATION_RULES.md"
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 def load_data() -> pd.DataFrame:
     if not RAW_PROCESSED_PATH.exists():
         raise FileNotFoundError(f"Processed dataset not found: {RAW_PROCESSED_PATH}")
@@ -145,10 +151,27 @@ def write_report(rules: pd.DataFrame) -> None:
 
 
 def main() -> None:
+    print_heading("STEP 1: LOAD PROCESSED DATA")
     df = load_data()
+    print("Processed dataset loaded")
+    print("Shape:", df.shape)
+    print(df[["loan_amnt", "annual_inc", "dti", "int_rate", "term", "grade", "default_flag"]].head())
+
+    print_heading("STEP 2: CREATE TRANSACTION TABLE")
     transactions = build_transaction_frame(df)
+    print("Continuous features converted into low / medium / high buckets")
+    print(transactions.head())
+
+    print_heading("STEP 3: ENCODE TRANSACTIONS")
     encoded_transactions = encode_transactions(transactions)
+    print("Encoded transaction table shape:", encoded_transactions.shape)
+
+    print_heading("STEP 4: APPLY APRIORI AND GENERATE RULES")
     rules = mine_rules(encoded_transactions)
+    print("Top association rules:")
+    print(rules.head(10) if not rules.empty else "No rules found with current thresholds")
+
+    print_heading("STEP 5: SAVE ASSOCIATION RULE OUTPUTS")
     rules.to_csv(RULES_OUTPUT_PATH, index=False)
     write_report(rules)
     print(f"Association rules saved to: {RULES_OUTPUT_PATH}")

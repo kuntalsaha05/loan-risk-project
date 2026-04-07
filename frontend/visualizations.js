@@ -91,9 +91,9 @@ function drawRiskDistributionChart() {
   charts.riskDist = new Chart(ctx, {
     type: 'pie',
     data: {
-      labels: ['Low Risk (0-33%)', 'Medium Risk (34-66%)', 'High Risk (67-100%)'],
+      labels: ['Low Risk Cluster', 'Medium Risk Cluster', 'High Risk Cluster'],
       datasets: [{
-        data: [54, 27, 19],
+        data: [34.9, 24.8, 40.4],
         backgroundColor: [
           'rgba(45, 152, 93, 0.8)',
           'rgba(232, 177, 74, 0.8)',
@@ -137,7 +137,7 @@ function drawClusterChart() {
     data: {
       labels: ['Low Risk', 'Medium Risk', 'High Risk'],
       datasets: [{
-        data: [64794, 32769, 22437],
+        data: [41823, 29702, 48475],
         backgroundColor: [
           'rgba(212, 240, 224, 0.8)',
           'rgba(253, 232, 197, 0.8)',
@@ -191,7 +191,7 @@ function drawDefaultRateChart() {
       labels: ['Low Risk', 'Medium Risk', 'High Risk'],
       datasets: [{
         label: 'Default Rate (%)',
-        data: [0, 3.54, 99.97],
+        data: [11.99, 18.93, 26.73],
         backgroundColor: [
           'rgba(45, 152, 93, 0.6)',
           'rgba(232, 177, 74, 0.6)',

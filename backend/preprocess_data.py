@@ -20,6 +20,12 @@ PROCESSED_DATA_PATH = DATA_DIR / "processed_lending_club_loan.csv"
 DATASET_DESCRIPTION_PATH = BASE_DIR / "report" / "DATASET_DESCRIPTION.md"
 
 
+def print_heading(title: str) -> None:
+    print("\n" + "=" * 70)
+    print(title)
+    print("=" * 70)
+
+
 def load_dataset() -> pd.DataFrame:
     if not RAW_DATA_PATH.exists():
         raise FileNotFoundError(f"Dataset not found: {RAW_DATA_PATH}")
@@ -164,9 +170,39 @@ def generate_dataset_description(df: pd.DataFrame) -> None:
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    print_heading("STEP 1: LOAD LOAN DATASET")
     df = load_dataset()
+    print("Raw dataset loaded successfully")
+    print("Raw shape:", df.shape)
+    print("Raw columns:")
+    print(df.columns.tolist())
+    print("\nFirst 5 rows:")
+    print(df.head())
+    print("\nMissing values before cleaning:")
+    print(df.isnull().sum().sort_values(ascending=False).head(15))
+
+    print_heading("STEP 2: FEATURE ENGINEERING")
     df = add_engineered_features(df)
+    print("Created new features:")
+    print("- default_flag")
+    print("- default_stage")
+    print("- issue_year")
+    print("- issue_month")
+    print("- credit_history_years")
+    print("\nDefault stage distribution:")
+    print(df["default_stage"].value_counts(dropna=False))
+
+    print_heading("STEP 3: DATA CLEANING AND REDUCTION")
     df = clean_dataset(df)
+    print("Selected useful columns and handled missing values")
+    print("Processed shape:", df.shape)
+    print("\nProcessed data types:")
+    print(df.dtypes)
+    print("\nFirst 5 processed rows:")
+    print(df.head())
+
+    print_heading("STEP 4: SAVE OUTPUT FILES")
     df.to_csv(PROCESSED_DATA_PATH, index=False)
     generate_dataset_description(df)
     print(f"Processed dataset saved to: {PROCESSED_DATA_PATH}")

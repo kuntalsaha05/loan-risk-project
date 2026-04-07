@@ -27,9 +27,9 @@ const models = [
 ];
 
 const clusters = [
-  { name: "low_risk", records: "64,794", defaultFlag: 0.0000 },
-  { name: "medium_risk", records: "32,769", defaultFlag: 0.0354 },
-  { name: "high_risk", records: "22,437", defaultFlag: 0.9997 },
+  { name: "low_risk", records: "41,823", defaultFlag: 0.1199 },
+  { name: "medium_risk", records: "29,702", defaultFlag: 0.1893 },
+  { name: "high_risk", records: "48,475", defaultFlag: 0.2673 },
 ];
 
 // Utility Functions
@@ -40,7 +40,12 @@ function riskClass(name) {
 }
 
 function formatNumber(num) {
-  return new Intl.NumberFormat('en-US').format(num);
+  const value = typeof num === "string" ? Number(num.replace(/,/g, "")) : Number(num);
+  return new Intl.NumberFormat("en-US").format(value);
+}
+
+function parseNumber(num) {
+  return typeof num === "string" ? Number(num.replace(/,/g, "")) : Number(num);
 }
 
 // Render Functions
@@ -205,8 +210,8 @@ function initClustersChart() {
   const ctx = document.getElementById("clusters-chart");
   if (!ctx) return;
 
-  const totalBorrowers = clusters.reduce((sum, c) => sum + parseInt(c.records.replace(/,/g, "")), 0);
-  const clusterData = clusters.map(c => parseInt(c.records.replace(/,/g, "")));
+  const totalBorrowers = clusters.reduce((sum, c) => sum + parseNumber(c.records), 0);
+  const clusterData = clusters.map(c => parseNumber(c.records));
 
   const chartConfig = {
     type: "doughnut",

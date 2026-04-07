@@ -1,6 +1,18 @@
 // Admin Panel
 let charts = {};
 
+const clusterMetrics = [
+  { label: 'Low Risk', records: 41823, borrowerShare: 34.85, defaultRate: 11.99 },
+  { label: 'Medium Risk', records: 29702, borrowerShare: 24.75, defaultRate: 18.93 },
+  { label: 'High Risk', records: 48475, borrowerShare: 40.40, defaultRate: 26.73 },
+];
+
+const modelMetrics = [
+  { label: 'Logistic Regression', accuracy: 80.56, f1: 8.76 },
+  { label: 'Decision Tree', accuracy: 80.17, f1: 14.76 },
+  { label: 'Random Forest', accuracy: 80.47, f1: 3.58 },
+];
+
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(() => {
     initializeAdminCharts();
@@ -20,46 +32,31 @@ function drawAdminRiskChart() {
   const ctx = canvas.getContext('2d');
   
   charts.adminRisk = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      labels: clusterMetrics.map(cluster => cluster.label),
       datasets: [
         {
-          label: 'Low Risk',
-          data: [45, 48, 50, 52, 51, 54, 56, 55, 57, 58, 60, 62],
-          borderColor: 'rgba(45, 152, 93, 1)',
-          backgroundColor: 'rgba(45, 152, 93, 0.1)',
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true
+          label: 'Borrower Share (%)',
+          data: clusterMetrics.map(cluster => cluster.borrowerShare),
+          backgroundColor: 'rgba(75, 120, 168, 0.6)',
+          borderColor: 'rgba(75, 120, 168, 1)',
+          borderWidth: 2,
+          borderRadius: 8
         },
         {
-          label: 'Medium Risk',
-          data: [30, 28, 27, 25, 26, 24, 22, 23, 21, 20, 19, 18],
-          borderColor: 'rgba(232, 177, 74, 1)',
-          backgroundColor: 'rgba(232, 177, 74, 0.1)',
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true
-        },
-        {
-          label: 'High Risk',
-          data: [25, 24, 23, 23, 23, 22, 22, 22, 22, 22, 21, 20],
+          label: 'Default Rate (%)',
+          data: clusterMetrics.map(cluster => cluster.defaultRate),
           borderColor: 'rgba(199, 62, 29, 1)',
-          backgroundColor: 'rgba(199, 62, 29, 0.1)',
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true
+          backgroundColor: 'rgba(199, 62, 29, 0.6)',
+          borderWidth: 2,
+          borderRadius: 8
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: 'index',
-        intersect: false
-      },
       plugins: {
         legend: {
           labels: {
@@ -86,7 +83,7 @@ function drawAdminRiskChart() {
         x: {
           ticks: {
             color: '#7a7268',
-            font: { size: 12 }
+            font: { size: 12, weight: '600' }
           },
           grid: { display: false }
         }
@@ -104,20 +101,16 @@ function drawLoanStatusChart() {
   charts.loanStatus = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Active', 'Paid Off', 'Defaulted', 'In Process'],
+      labels: ['Non-Default', 'Default'],
       datasets: [{
-        data: [60, 25, 10, 5],
+        data: [318357, 77673],
         backgroundColor: [
           'rgba(45, 152, 93, 0.8)',
-          'rgba(75, 120, 168, 0.8)',
-          'rgba(199, 62, 29, 0.8)',
-          'rgba(232, 177, 74, 0.8)'
+          'rgba(199, 62, 29, 0.8)'
         ],
         borderColor: [
           'rgba(45, 152, 93, 1)',
-          'rgba(75, 120, 168, 1)',
-          'rgba(199, 62, 29, 1)',
-          'rgba(232, 177, 74, 1)'
+          'rgba(199, 62, 29, 1)'
         ],
         borderWidth: 2
       }]
@@ -134,6 +127,16 @@ function drawLoanStatusChart() {
             padding: 16,
             usePointStyle: true
           }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed;
+              const total = 396030;
+              const percentage = ((value / total) * 100).toFixed(2);
+              return `${context.label}: ${value.toLocaleString()} (${percentage}%)`;
+            }
+          }
         }
       }
     }
@@ -149,27 +152,19 @@ function drawTrendsChart() {
   charts.trends = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+      labels: modelMetrics.map(model => model.label),
       datasets: [
         {
-          label: 'Approvals',
-          data: [850, 920, 1100, 1450],
-          backgroundColor: 'rgba(45, 152, 93, 0.6)',
-          borderColor: 'rgba(45, 152, 93, 1)',
+          label: 'Accuracy (%)',
+          data: modelMetrics.map(model => model.accuracy),
+          backgroundColor: 'rgba(75, 120, 168, 0.6)',
+          borderColor: 'rgba(75, 120, 168, 1)',
           borderWidth: 2,
           borderRadius: 8
         },
         {
-          label: 'Defaults',
-          data: [120, 145, 180, 220],
-          backgroundColor: 'rgba(199, 62, 29, 0.6)',
-          borderColor: 'rgba(199, 62, 29, 1)',
-          borderWidth: 2,
-          borderRadius: 8
-        },
-        {
-          label: 'Disputes',
-          data: [45, 52, 68, 95],
+          label: 'F1 Score (%)',
+          data: modelMetrics.map(model => model.f1),
           backgroundColor: 'rgba(232, 177, 74, 0.6)',
           borderColor: 'rgba(232, 177, 74, 1)',
           borderWidth: 2,
@@ -192,11 +187,13 @@ function drawTrendsChart() {
       },
       scales: {
         y: {
+          beginAtZero: true,
+          max: 100,
           ticks: {
             color: '#7a7268',
             font: { size: 12 },
             callback: function(value) {
-              return value.toLocaleString();
+              return value + '%';
             }
           },
           grid: { color: 'rgba(90, 80, 70, 0.08)' }
